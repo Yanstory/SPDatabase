@@ -112,7 +112,7 @@ const items = [
       {
         icon: 'mdi-record-circle-outline',
         text: '前往 GitHub Issue',
-        action: () => openLink(''),
+        action: () => openLink('https://github.com/Yanstory/SPDatabase/issues'),
       },
     ],
   },
@@ -132,7 +132,7 @@ const items = [
       {
         icon: 'mdi-xml',
         text: '前往 GitHub 仓库',
-        action: () => openLink(''),
+        action: () => openLink('https://github.com/Yanstory/SPDatabase'),
       },
     ],
   },

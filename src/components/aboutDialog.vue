@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { getIsMobile } from '../util/display.js';
 import { DEV_LIST } from '../util/const.js';
+import { getPublicImg } from "../util/general.js"
 import devCard from './core/devCard.vue';
 
 const show = ref(false);
@@ -151,7 +152,7 @@ defineExpose({
                 :offset-x="17"
                 :offset-y="22"
               >
-                <v-img src="/staff/mcak.png" :width="100"></v-img>
+                <v-img :src="getPublicImg('/staff/mcak.png')" :width="100"></v-img>
                 <template v-slot:badge>
                   <v-sheet class="d-flex align-center bg-transparent">
                     <v-icon icon="mdi-heart" size="20"></v-icon>

@@ -64,7 +64,8 @@ const filtedOpList = computed(() => {
   //console.log('result', result);
   //console.log('opList', opList);
 
-  Object.keys(opList).forEach((oid) => {
+  if (opList) {
+    Object.keys(opList).forEach((oid) => {
     let charChess = opList[oid].chess;
     let acc = [true, true];
 
@@ -90,6 +91,7 @@ const filtedOpList = computed(() => {
       res.push(oid);
     }
   });
+  }
 
   //console.log(res);
   return res;
@@ -254,9 +256,9 @@ onMounted(async () => {
       <div class="text-center">
         {{ new Date().getFullYear() }} — <strong>PRTS.WIKI</strong>
       </div>
-      <div>
+      <div v-if="filtedOpList && rawDatabase">
         {{
-          `${filtedOpList.length} / ${Object.keys(rawDatabase.opList).length}`
+          `${filtedOpList.length} / ${Object.keys(rawDatabase?.opList || {}).length}`
         }}
         <v-btn
           @click="goToTop"

@@ -1,5 +1,16 @@
-# Vue 3 + Vite
+# SPDatabase
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A simple Stronghold Protocal Alliance & Property Look-up powered by [Vite](https://vite.dev/) and [Vue.js](https://vuejs.org).
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+[Dist](https://static.prts.wiki/app/spdatabase/index.html)
+
+## Develop
+The following are changed or added to distribute:
+- Favicon.
+- `base` in Vite config.
+- `getPublicImg` in `util/general.js` to read files in /public correctly.
+
+## Special Thanks
+- [PRTS.WIKI](https://prts.wiki/), the Arknights CN Wiki contributed by players.
+- [Vuetify](https://github.com/vuetifyjs/vuetify), the great UI framework.
+- [StackBlitz](https://stackblitz.com/), the online IDE.

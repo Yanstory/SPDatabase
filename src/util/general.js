@@ -7,6 +7,10 @@ export function getImagePath(filename) {
   return `${MEDIA_ENDPOINT}/${md5.slice(0, 1)}/${md5.slice(0, 2)}/${filename}`;
 }
 
+export function getPublicImg(path) {
+  return `${import.meta.env.BASE_URL.slice(0, -1)}${path}`
+}
+
 export const PROFESSTION_MAP = {
   PIONEER: '先锋',
   WARRIOR: '近卫',
