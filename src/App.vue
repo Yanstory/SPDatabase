@@ -1,13 +1,16 @@
 <script setup>
 import { ref, computed, onMounted, mergeProps } from 'vue';
+import { useUrlSearchParams } from '@vueuse/core'
 import aboutDialog from './components/aboutDialog.vue';
 import updateLogDialog from './components/updateLogDialog.vue';
 import helpDialog from './components/helpDialog.vue';
-import { SP_SEASON, getSPDatabase } from './util/SPData.js';
+import { SP_SEASON, getSPDatabase, findSeasonNo } from './util/SPData.js';
 import filterSelector from './components/core/filter.vue';
 import charPanel from './components/charPanel.vue';
 import { getIsMobile } from './util/display.js';
 import { useGoTo } from 'vuetify';
+
+const route = useUrlSearchParams('history')
 
 const goTo = useGoTo();
 
@@ -101,6 +104,11 @@ const filtedOpList = computed(() => {
 const switchSeasonDatabase = function (i) {
   if (seasonNo.value != i + 1) {
     seasonNo.value = i + 1;
+    if (seasonNo.value == 1) {
+      route.season = null
+    } else {
+      route.season = SP_SEASON[seasonNo.value].routeName
+    }
     refreshDatabase();
   }
 };
@@ -117,6 +125,10 @@ const goToTop = function () {
 };
 
 onMounted(async () => {
+  const routeName = route.season
+  if (routeName && routeName != "") {
+    seasonNo.value = findSeasonNo(routeName)
+  }
   refreshDatabase();
 });
 </script>

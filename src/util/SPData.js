@@ -6,6 +6,7 @@ const SP_SEASON = {
   1: {
     mode: 'ACTIVITY_SEASON',
     seasonCode: 'act2autochess',
+    routeName: 'alliance_2nd',
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约 下半',
@@ -15,12 +16,17 @@ const SP_SEASON = {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
     archiveFile: 'alliance_1st.json',
+    routeName: 'alliance',
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约',
     },
   },
 };
+
+const findSeasonNo = function(routeName) {
+  return Object.keys(SP_SEASON).find((seasonNo) => SP_SEASON[seasonNo].routeName == routeName) || 1
+}
 
 const ACT_EXTRA_DATAKEY = 'autoChessData';
 
@@ -196,4 +202,4 @@ const uniquied = function (data) {
   return uniqueArr;
 };
 
-export { SP_SEASON, getSPDatabase };
+export { SP_SEASON, getSPDatabase, findSeasonNo };
