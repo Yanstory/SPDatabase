@@ -29,10 +29,14 @@ const goToOpPage = (link) => {
 const props = defineProps({
   char: Object,
   isShow: Boolean,
+  isGird: {
+    type: Boolean,
+    default: false
+  }
 });
 </script>
 <template>
-  <tr v-if="isShow">
+  <tr v-if="isShow && !isGird">
     <td rowspan="2" :style="{ width: mobile ? '100px' : '160px' }" class="pa-0">
       <v-sheet class="d-flex flex-column align-center">
         <div class="position-relative">
@@ -96,7 +100,7 @@ const props = defineProps({
       </v-sheet>
     </td>
   </tr>
-  <tr v-if="isShow">
+  <tr v-if="isShow && !isGird">
     <td style="width: 2em" class="pa-0">
       <div>
         <v-chip label color="#ffd533"> 精锐 </v-chip>
@@ -116,6 +120,47 @@ const props = defineProps({
       </v-sheet>
     </td>
   </tr>
+  <v-sheet v-if="isShow && isGird" class="d-flex flex-column align-center">
+        <div class="position-relative">
+          <v-avatar
+            :image="getAvatar(char.id)"
+            rounded="0"
+            :size="mobile ? 45 : 70"
+            :color="`rare-${char.rarity}`"
+            @click="goToOpPage(char.link || char.name)"
+            class="op-icon cursor-pointer"
+          ></v-avatar>
+          <v-img
+            class="position-absolute left-0 top-0 pointer-events-none"
+            :width="mobile ? 12 : 20"
+            :src="getImagePath(`图标_职业_${char.profession}.png`)"
+          />
+          <div
+            :class="[
+              'border-md border-opacity-50 pa-0 pointer-events-none',
+              'position-absolute right-0 top-0',
+              `border-rank-${char.chess[0].rank} text-rank-${char.chess[0].rank}`,
+            ]"
+            style="
+              width: 1.8em;
+              text-align: center;
+              font-size: 0.72em;
+              font-weight: bold;
+              background: #0009;
+            "
+          >
+            {{ rankText[char.chess[0].rank] }}
+          </div>
+        </div>
+        <v-img
+          width="100%"
+          height="15"
+          :src="getImagePath(`稀有度_黄_${char.rarity - 1}.png`)"
+        />
+        <div class="d-flex align-center">
+          {{ char.name }}
+        </div>
+      </v-sheet>
 </template>
 
 <style scoped>

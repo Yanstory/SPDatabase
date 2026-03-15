@@ -13,4 +13,5 @@ The following are changed or added to distribute:
 ## Special Thanks
 - [PRTS.WIKI](https://prts.wiki/), the Arknights CN Wiki contributed by players.
 - [Vuetify](https://github.com/vuetifyjs/vuetify), the great UI framework.
+- [VueUse](https://github.com/vueuse/vueuse), the utilities save my life.
 - [StackBlitz](https://stackblitz.com/), the online IDE.

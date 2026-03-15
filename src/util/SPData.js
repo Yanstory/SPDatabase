@@ -3,16 +3,17 @@ import { fetchJSON, fetchJSON_arc } from './const.js';
 import { PROFESSTION_MAP } from './general.js';
 
 const SP_SEASON = {
-  1: {
+  2: {
     mode: 'ACTIVITY_SEASON',
     seasonCode: 'act2autochess',
     routeName: 'alliance_2nd',
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约 下半',
+      subtext: 'Alliance 2nd Phase'
     },
   },
-  2: {
+  1: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
     archiveFile: 'alliance_1st.json',
@@ -20,6 +21,7 @@ const SP_SEASON = {
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约',
+      subtext: 'Alliance'
     },
   },
 };

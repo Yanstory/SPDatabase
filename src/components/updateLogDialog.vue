@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { getIsMobile } from '../util/display.js';
+import { getSetting, setSetting } from '../util/setting.js'
 
 const show = ref(false);
 
@@ -8,6 +9,7 @@ const mobile = getIsMobile();
 
 function switchDialog() {
   show.value = !show.value;
+  setSetting('lastVisitedVersion', getSetting('curVersion'))
 }
 
 const items = [
@@ -38,7 +40,7 @@ const items = [
       },
       {
         type: 'list',
-        text: ['适配存档数据库读取', '适配活动期：盟约 下半'],
+        text: ['适配活动期：盟约 下半', '适配存档数据库读取', '新增【网址参数】以直接访问特定活动期（可在选择活动期中确认当前活动期参数）', '新增列表布局切换功能'],
       },
     ],
   },
