@@ -1,9 +1,16 @@
+import { getPublicPath } from './general.js';
+
 export const TORAPPU_ENDPOINT = 'https://torappu.prts.wiki';
 export const PRTS_BASE_DOMAIN = 'https://prts.wiki';
 export const MEDIA_ENDPOINT = 'https://media.prts.wiki';
 
 export const fetchJSON = async function (path) {
   const resp = await fetch(`${TORAPPU_ENDPOINT}/gamedata/latest/` + path);
+  return await resp.json();
+};
+
+export const fetchJSON_arc = async function (path) {
+  const resp = await fetch(getPublicPath(`/archive/` + path));
   return await resp.json();
 };
 

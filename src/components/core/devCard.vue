@@ -1,5 +1,5 @@
 <script setup>
-import { getPublicImg } from "../../util/general.js"
+import { getPublicPath } from "../../util/general.js"
 
 defineProps({
   dev: Object,
@@ -17,7 +17,7 @@ function openLink(link) {
 <template>
   <v-card
     class="mx-auto"
-    :prepend-avatar="!dev.spAvatar ? getPublicImg(dev.avatar) : ''"
+    :prepend-avatar="!dev.spAvatar ? getPublicPath(dev.avatar) : ''"
     :subtitle="dev.desc"
     :title="dev.name"
     density="compact"
@@ -27,7 +27,7 @@ function openLink(link) {
   >
     <template v-slot:prepend v-if="dev.spAvatar">
       <v-avatar size="40" rounded color="transparent">
-        <v-img :src="getPublicImg(dev.avatar)"></v-img>
+        <v-img :src="getPublicPath(dev.avatar)"></v-img>
       </v-avatar>
     </template>
   </v-card>

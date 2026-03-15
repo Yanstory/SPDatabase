@@ -12,7 +12,6 @@ function switchDialog() {
 
 const items = [
   {
-    current: true,
     color: 'primary',
     icon: 'mdi-play',
     title: 'ver 0.01_dev',
@@ -24,6 +23,22 @@ const items = [
       {
         type: 'list',
         text: ['基础UI、功能、框架建设', '适配数据库读取', '适配活动期：盟约'],
+      },
+    ],
+  },
+  {
+    current: true,
+    color: 'primary',
+    icon: 'mdi-play',
+    title: 'ver 0.02_dev',
+    content: [
+      {
+        type: 'param',
+        text: '开发版本',
+      },
+      {
+        type: 'list',
+        text: ['适配存档数据库读取', '适配活动期：盟约 下半'],
       },
     ],
   },
