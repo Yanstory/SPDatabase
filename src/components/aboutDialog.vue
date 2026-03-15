@@ -28,11 +28,6 @@ function switchOpenSrc() {
 
 const openSrcItems = [
   {
-    title: 'VueUse',
-    license: 'MIT License',
-    link: 'https://github.com/vueuse/vueuse',
-  },
-  {
     title: 'Vite',
     license: 'MIT License',
     link: 'https://github.com/vitejs/vite',
@@ -46,6 +41,11 @@ const openSrcItems = [
     title: 'Vuetify',
     license: 'MIT License',
     link: 'https://github.com/vuetifyjs/vuetify',
+  },
+  {
+    title: 'VueUse',
+    license: 'MIT License',
+    link: 'https://github.com/vueuse/vueuse',
   },
 ];
 

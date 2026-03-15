@@ -3,7 +3,7 @@ import { fetchJSON, fetchJSON_arc } from './const.js';
 import { PROFESSTION_MAP } from './general.js';
 
 const SP_SEASON = {
-  2: {
+  1: {
     mode: 'ACTIVITY_SEASON',
     seasonCode: 'act2autochess',
     routeName: 'alliance_2nd',
@@ -13,7 +13,7 @@ const SP_SEASON = {
       subtext: 'Alliance 2nd Phase'
     },
   },
-  1: {
+  2: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
     archiveFile: 'alliance_1st.json',
@@ -52,6 +52,9 @@ const spCharRedirect = {
   //char_617_sharp2: '领主·Sharp',
   //char_616_pithst: '盟约·辅助干员',
 };
+const bondBan = [
+  '绝技'
+]
 
 const OP_DATA = await fetchJSON('excel/character_table.json');
 const ACT_DATA = await fetchJSON('excel/activity_table.json');
@@ -98,7 +101,7 @@ const getSPDatabase = async function (seasonNo) {
         genFilterRule(
           '附加盟约',
           Object.values(bondMetaList).reduce((acc, bond) => {
-            if (bond.bondType == 'REGULAR') {
+            if (bond.bondType == 'REGULAR' && !bondBan.includes(bond.name)) {
               return [...acc, { key: bond.bondId, name: bond.name }];
             }
             return acc;
