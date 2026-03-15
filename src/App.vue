@@ -1,13 +1,17 @@
 <script setup>
 import { ref, computed, onMounted, mergeProps } from 'vue';
+import { useUrlSearchParams } from '@vueuse/core'
+import { getSetting } from './util/setting.js'
 import aboutDialog from './components/aboutDialog.vue';
 import updateLogDialog from './components/updateLogDialog.vue';
 import helpDialog from './components/helpDialog.vue';
-import { SP_SEASON, getSPDatabase } from './util/SPData.js';
+import { SP_SEASON, getSPDatabase, findSeasonNo } from './util/SPData.js';
 import filterSelector from './components/core/filter.vue';
 import charPanel from './components/charPanel.vue';
 import { getIsMobile } from './util/display.js';
 import { useGoTo } from 'vuetify';
+
+const route = useUrlSearchParams('history')
 
 const goTo = useGoTo();
 
@@ -20,6 +24,11 @@ const flS = ref();
 
 const appbarMenu = ref([
   {
+    icon: 'mdi-view-grid',
+    text: '切换列表布局',
+    action: () => switchOpDisplayMode(),
+  },
+  {
     icon: 'mdi-help-box',
     text: '帮助',
     action: () => hlD.value?.switchDialog(),
@@ -28,6 +37,10 @@ const appbarMenu = ref([
     icon: 'mdi-timeline-clock',
     text: '更新履历',
     action: () => uLD.value?.switchDialog(),
+    dynamic: {
+      type: 'red-dot',
+      condition: () => getSetting('curVersion') != getSetting('lastVisitedVersion')
+    }
   },
   {
     icon: 'mdi-information-box-outline',
@@ -44,12 +57,15 @@ const seasonDropDown = computed(() => {
     return {
       title: s.menuitem.text,
       icon: s.menuitem.icon,
+      subtext: s.menuitem.subtext,
+      routeName: s.routeName
     };
   });
 });
 const getSeasonMenuItem = function () {
   return SP_SEASON[seasonNo.value.toString()].menuitem;
 };
+const opDisplayModeIsGrid = ref(false);
 
 const filtedOpList = computed(() => {
   let res = [];
@@ -101,6 +117,11 @@ const filtedOpList = computed(() => {
 const switchSeasonDatabase = function (i) {
   if (seasonNo.value != i + 1) {
     seasonNo.value = i + 1;
+    if (seasonNo.value == 1) {
+      route.season = null
+    } else {
+      route.season = SP_SEASON[seasonNo.value].routeName
+    }
     refreshDatabase();
   }
 };
@@ -115,8 +136,24 @@ const goToTop = function () {
     offset: 0,
   });
 };
+const switchOpDisplayMode = function () {
+  opDisplayModeIsGrid.value = !opDisplayModeIsGrid.value
+  if (opDisplayModeIsGrid.value) {
+    route.grid = 'true'
+  } else {
+    route.grid = null
+  }
+}
 
 onMounted(async () => {
+  const routeName = route.season
+  if (routeName && routeName != "") {
+    seasonNo.value = findSeasonNo(routeName)
+  }
+  const grid = route.grid
+  if (grid) {
+    opDisplayModeIsGrid.value = true
+  }
   refreshDatabase();
 });
 </script>
@@ -136,7 +173,7 @@ onMounted(async () => {
         </span>
       </v-app-bar-title>
 
-      <v-menu location="bottom" transition="slide-y-transition">
+      <v-menu location="bottom right" transition="slide-y-transition">
         <template v-slot:activator="{ props: menu }">
           <v-tooltip location="left">
             <template v-slot:activator="{ props: tooltip }">
@@ -166,13 +203,20 @@ onMounted(async () => {
               <v-icon v-else :icon="item.icon" />
             </template>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-subtitle class="text-caption" v-if="seasonNo == index + 1">{{ item.subtext }} ({{ item.routeName }})</v-list-item-subtitle>
           </v-list-item>
         </v-list>
       </v-menu>
 
       <v-sheet class="bg-transparent" v-if="!mobile">
         <v-btn icon v-for="btn in appbarMenu" @click="btn.action">
-          <v-icon :icon="btn.icon" />
+          <v-icon v-if="!btn.dynamic" :icon="btn.icon" />
+          <v-badge v-else-if="btn.dynamic && btn.dynamic.type=='red-dot'"
+            :class="btn.dynamic.condition() ? 'red-dot' : ''"
+            location="top right" :color="btn.dynamic.condition() ? '#f48686' : 'transparent'"
+            floating dot>
+            <v-icon :icon="btn.icon" />
+          </v-badge>
           <v-tooltip activator="parent" location="bottom">{{
             btn.text
           }}</v-tooltip>
@@ -193,6 +237,13 @@ onMounted(async () => {
           >
             <template #prepend>
               <v-icon :icon="btn.icon" />
+            </template>
+            <template #append>
+              <v-badge v-if="btn.dynamic && btn.dynamic.type=='red-dot' && btn.dynamic.condition()"
+                color="#f48686"
+                content="NEW"
+                inline
+              ></v-badge>
             </template>
             <v-list-item-title>{{ btn.text }}</v-list-item-title>
           </v-list-item>
@@ -231,17 +282,59 @@ onMounted(async () => {
       <!--干员列表-->
       <v-sheet class="pt-2">
         <v-table
-          hover
+          :hover="opDisplayModeIsGrid ? false : true"
           class="mx-auto"
           density="compact"
           :style="{ width: mobile ? '100%' : '90%' }"
         >
-          <tbody>
+          <tbody v-if="!opDisplayModeIsGrid">
             <charPanel
               v-for="(char, index) in rawDatabase.opList"
               :isShow="filtedOpList.includes(index)"
               :char="char"
+              :isGird="false"
             />
+            <tr v-if="filtedOpList.length == 0">
+              <td>
+                <v-sheet class="d-flex flex-column align-center pt-7 pb-7">
+                  <v-icon icon="mdi-account-question-outline" size="150px" color="grey-darken-2"/>
+                  <i class="pt-4">什么也没有……</i>
+                </v-sheet>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr v-if="filtedOpList.length != 0">
+              <td rowspan="2" :style="{ width: mobile ? '100px' : '160px' }" class="pa-0">
+                <v-container class="px-0">
+                  <v-row no-gutters>
+                    <template v-for="(char, index) in rawDatabase.opList" :key="index">
+                      <v-col
+                        v-if="filtedOpList.includes(index)"
+                        :cols="mobile ? 2 : 1"
+                        sm="1"
+                      >
+                        <v-sheet :class="mobile ? 'mt-1 mb-2 text-center' : 'ma-1'">
+                          <charPanel
+                            :isShow="filtedOpList.includes(index)"
+                            :char="char"
+                            :isGird="true"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </template>
+                  </v-row>
+                </v-container>
+              </td>
+            </tr>
+            <tr v-else>
+              <td>
+                <v-sheet class="d-flex flex-column align-center pt-7 pb-7">
+                  <v-icon icon="mdi-account-question-outline" size="150px" color="grey-darken-2"/>
+                  <i class="pt-4">什么也没有……</i>
+                </v-sheet>
+              </td>
+            </tr>
           </tbody>
         </v-table>
       </v-sheet>
@@ -274,4 +367,23 @@ onMounted(async () => {
   </v-app>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+.red-dot :deep(.v-badge__badge)  {
+  animation: shine-ripple infinite ease-out 2s;
+}
+
+@keyframes shine-ripple {
+  0% {
+    outline: 0px solid rgba(255, 255, 255, 0.534);
+  }
+
+  50% {
+    outline: 20px solid #fff0;
+  }
+
+  100% {
+    outline: 20px solid #fff0;
+  }
+}
+</style>

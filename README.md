@@ -8,9 +8,10 @@ A simple Stronghold Protocal Alliance & Property Look-up powered by [Vite](https
 The following are changed or added to distribute:
 - Favicon.
 - `base` in Vite config.
-- `getPublicImg` in `util/general.js` to read files in /public correctly.
+- `getPublicPath` in `util/general.js` to read files in /public correctly.
 
 ## Special Thanks
 - [PRTS.WIKI](https://prts.wiki/), the Arknights CN Wiki contributed by players.
 - [Vuetify](https://github.com/vuetifyjs/vuetify), the great UI framework.
+- [VueUse](https://github.com/vueuse/vueuse), the utilities save my life.
 - [StackBlitz](https://stackblitz.com/), the online IDE.

@@ -7,7 +7,7 @@ export function getImagePath(filename) {
   return `${MEDIA_ENDPOINT}/${md5.slice(0, 1)}/${md5.slice(0, 2)}/${filename}`;
 }
 
-export function getPublicImg(path) {
+export function getPublicPath(path) {
   return `${import.meta.env.BASE_URL.slice(0, -1)}${path}`
 }
 

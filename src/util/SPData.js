@@ -1,17 +1,34 @@
-import { fetchJSON } from './const.js';
+import { fetchJSON, fetchJSON_arc } from './const.js';
 
 import { PROFESSTION_MAP } from './general.js';
 
 const SP_SEASON = {
   1: {
     mode: 'ACTIVITY_SEASON',
+    seasonCode: 'act2autochess',
+    routeName: 'alliance_2nd',
+    menuitem: {
+      icon: 'mdi-dots-triangle',
+      text: '盟约 下半',
+      subtext: 'Alliance 2nd Phase'
+    },
+  },
+  2: {
+    mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
+    archiveFile: 'alliance_1st.json',
+    routeName: 'alliance',
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约',
+      subtext: 'Alliance'
     },
   },
 };
+
+const findSeasonNo = function(routeName) {
+  return Object.keys(SP_SEASON).find((seasonNo) => SP_SEASON[seasonNo].routeName == routeName) || 1
+}
 
 const ACT_EXTRA_DATAKEY = 'autoChessData';
 
@@ -35,14 +52,17 @@ const spCharRedirect = {
   //char_617_sharp2: '领主·Sharp',
   //char_616_pithst: '盟约·辅助干员',
 };
+const bondBan = [
+  '绝技'
+]
 
 const OP_DATA = await fetchJSON('excel/character_table.json');
 const ACT_DATA = await fetchJSON('excel/activity_table.json');
 
 const getSPDatabase = async function (seasonNo) {
   const season = SP_SEASON[seasonNo.toString()];
-  if (season.mode == 'ACTIVITY_SEASON') {
-    let actData = ACT_DATA;
+  if (season.mode == 'ACTIVITY_SEASON' || season.mode == 'ACTIVITY_SEASON_ARC') {
+    let actData = season.mode == 'ACTIVITY_SEASON' ? ACT_DATA : (await fetchJSON_arc(season.archiveFile));
     let bondMetaList = actData[ACT_EXTRA_DATAKEY].bondInfoDict;
     let garrisonList =
       actData.activity['AUTOCHESS_SEASON'][season.seasonCode].garrisonDataDict;
@@ -81,7 +101,7 @@ const getSPDatabase = async function (seasonNo) {
         genFilterRule(
           '附加盟约',
           Object.values(bondMetaList).reduce((acc, bond) => {
-            if (bond.bondType == 'REGULAR') {
+            if (bond.bondType == 'REGULAR' && !bondBan.includes(bond.name)) {
               return [...acc, { key: bond.bondId, name: bond.name }];
             }
             return acc;
@@ -187,4 +207,4 @@ const uniquied = function (data) {
   return uniqueArr;
 };
 
-export { SP_SEASON, getSPDatabase };
+export { SP_SEASON, getSPDatabase, findSeasonNo };
