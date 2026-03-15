@@ -1,13 +1,19 @@
 <script setup>
 import { ref, computed, onMounted, mergeProps } from 'vue';
 import { useUrlSearchParams } from '@vueuse/core'
+
 import { getSetting } from './util/setting.js'
+import { getNewsTime } from './util/bulletin.js'
+
 import aboutDialog from './components/aboutDialog.vue';
+import bulletinDialog from './components/bulletinDialog.vue';
 import updateLogDialog from './components/updateLogDialog.vue';
 import helpDialog from './components/helpDialog.vue';
+
 import { SP_SEASON, getSPDatabase, findSeasonNo } from './util/SPData.js';
 import filterSelector from './components/core/filter.vue';
 import charPanel from './components/charPanel.vue';
+
 import { getIsMobile } from './util/display.js';
 import { useGoTo } from 'vuetify';
 
@@ -18,6 +24,7 @@ const goTo = useGoTo();
 const mobile = getIsMobile();
 
 const abD = ref();
+const blD = ref();
 const uLD = ref();
 const hlD = ref();
 const flS = ref();
@@ -43,11 +50,29 @@ const appbarMenu = ref([
     }
   },
   {
+    icon: 'mdi-message-alert',
+    text: '公告板',
+    action: () => blD.value?.switchDialog(),
+    dynamic: {
+      type: 'red-dot',
+      condition: () => !getSetting('lastNewsViewTime') || getSetting('lastNewsViewTime') < getNewsTime()
+    }
+  },
+  {
     icon: 'mdi-information-box-outline',
     text: '关于',
     action: () => abD.value?.switchDialog(),
   },
 ]);
+const checkMenuUnread = function() {
+  let isUnread = false
+  appbarMenu.value.forEach((item) => {
+    if (item.dynamic) {
+      isUnread = isUnread || item.dynamic.condition()
+    }
+  })
+  return isUnread
+}
 
 //Database
 const seasonNo = ref(1);
@@ -225,7 +250,14 @@ onMounted(async () => {
 
       <v-menu v-if="mobile">
         <template v-slot:activator="{ props }">
-          <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
+          <v-btn icon variant="text" v-bind="props">
+            <v-badge
+              :class="checkMenuUnread() ? 'red-dot' : ''"
+              location="top right" :color="checkMenuUnread() ? '#f48686' : 'transparent'"
+              floating dot>
+              <v-icon icon="mdi-dots-vertical" />
+            </v-badge>
+          </v-btn>
         </template>
 
         <v-list>
@@ -251,6 +283,7 @@ onMounted(async () => {
       </v-menu>
 
       <aboutDialog ref="abD" />
+      <bulletinDialog ref="blD" />
       <updateLogDialog ref="uLD" />
       <helpDialog ref="hlD" />
     </v-app-bar>

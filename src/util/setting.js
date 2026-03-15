@@ -3,6 +3,7 @@ import { useStorage } from '@vueuse/core'
 const defaultSetting = {
     curVersion: '0.02',
     lastVisitedVersion: null,
+    lastNewsViewTime: null
 }
 const settings = useStorage('settings', defaultSetting, localStorage, { mergeDefaults: true })
 
