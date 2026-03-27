@@ -6,14 +6,35 @@ const SP_SEASON = {
   1: {
     mode: 'ACTIVITY_SEASON',
     seasonCode: 'act2autochess',
+    routeName: 'alliance_2nd_2',
+    menuitem: {
+      icon: 'mdi-dots-triangle',
+      text: '盟约 下半 更新#2',
+      subtext: 'Alliance 2nd Phase Update #2'
+    },
+    additionalParseParam: {
+      extraAddOp: [
+        "char_616_pithst"
+      ]
+    }
+  },
+  2: {
+    mode: 'ACTIVITY_SEASON_ARC',
+    seasonCode: 'act2autochess',
+    archiveFile: 'alliance_2nd.json',
     routeName: 'alliance_2nd',
     menuitem: {
       icon: 'mdi-dots-triangle',
       text: '盟约 下半',
       subtext: 'Alliance 2nd Phase'
     },
+    additionalParseParam: {
+      extraAddOp: [
+        "char_616_pithst"
+      ]
+    }
   },
-  2: {
+  3: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
     archiveFile: 'alliance_1st.json',
@@ -23,6 +44,11 @@ const SP_SEASON = {
       text: '盟约',
       subtext: 'Alliance'
     },
+    additionalParseParam: {
+      extraAddOp: [
+        "char_616_pithst"
+      ]
+    }
   },
 };
 
@@ -131,6 +157,12 @@ const getSPDatabase = async function (seasonNo) {
 
         let chessChar = result.season.charShopChessDatas[chess.chessId];
         let charId = chessChar.charId; //干员
+
+        //--------isHidden--------
+        if (chessChar.isHidden && !season.additionalParseParam.extraAddOp.includes(charId)) {
+          return
+        }
+
         //---------------------------------------------
         if (!(charId in result.opList)) {
           let charRaw = OP_DATA[charId];

@@ -141,6 +141,7 @@ const filtedOpList = computed(() => {
 //action
 const switchSeasonDatabase = function (i) {
   if (seasonNo.value != i + 1) {
+    flS.value?.removeAllItems();
     seasonNo.value = i + 1;
     if (seasonNo.value == 1) {
       route.season = null
@@ -222,13 +223,14 @@ onMounted(async () => {
             @click="switchSeasonDatabase(index)"
             density="compact"
             :class="[seasonNo == index + 1 ? 'bg-primary' : '']"
+            :lines="seasonNo == index + 1 ? 'two' : false"
           >
             <template #prepend>
               <v-icon v-if="seasonNo == index + 1" icon="mdi-check-circle" />
               <v-icon v-else :icon="item.icon" />
             </template>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-            <v-list-item-subtitle class="text-caption" v-if="seasonNo == index + 1">{{ item.subtext }} ({{ item.routeName }})</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-caption" v-if="seasonNo == index + 1">{{ item.subtext }}<br>({{ item.routeName }})</v-list-item-subtitle>
           </v-list-item>
         </v-list>
       </v-menu>

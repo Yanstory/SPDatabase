@@ -91,6 +91,10 @@ function removeItems(ruleSetIndex) {
   filterOptions.value.selectItems[ruleSetIndex] = [];
 }
 
+function removeAllItems() {
+  filterOptions.value.selectItems = filterOptions.value.selectItems.map(a => []);
+}
+
 function getRuleIcon(ruleSetIndex) {
   return ruleSetIcon.value[filterOptions.value.selectRule[ruleSetIndex]];
 }
@@ -119,6 +123,7 @@ defineExpose({
   showPanel,
   switchPanel,
   filterOptions,
+  removeAllItems
 });
 </script>
 

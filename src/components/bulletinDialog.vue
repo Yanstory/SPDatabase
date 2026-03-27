@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { getIsMobile } from '../util/display.js';
 import { setSetting } from '../util/setting.js'
 import { getNews } from '../util/bulletin.js'
+import dynDom from './core/dynDom.vue'
 
 const show = ref(false);
 
@@ -45,8 +46,7 @@ defineExpose({
           </v-card-title>
           <v-card-text class="pa-5">
             <p v-for="line in news.message">
-              <span v-if="line!=''">{{line}}</span>
-              <br v-else />
+              <dynDom :content="line" />
             </p>
           </v-card-text>
         </v-card>
