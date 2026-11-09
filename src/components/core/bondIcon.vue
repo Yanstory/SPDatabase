@@ -27,7 +27,7 @@ const props = defineProps({
         v-if="bond.id"
         class="position-absolute"
         style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
-        width="22"
+        width="30"
         :src="getImagePath(`卫戍协议：盟约_icon_${bond.id}.png`)"
       />
       <div

@@ -31,9 +31,9 @@ const items = [
     ],
   },
   {
-    current: true,
+    current: false,
     color: 'primary',
-    icon: 'mdi-play',
+    icon: 'mdi-source-commit',
     title: 'ver 0.02_dev',
     content: [
       {
@@ -45,6 +45,22 @@ const items = [
         text: ['适配活动期：盟约 下半', '适配及优化存档数据库读取',
           '新增【网址参数】以直接访问特定活动期（可在选择活动期中确认当前活动期参数）', '新增列表布局切换功能', '新增公告板功能',
           '修复了切换活动期后已选择的Tag残留，导致过滤结果可能出错的Bug'],
+      },
+    ],
+  },
+  {
+    current: true,
+    color: 'primary',
+    icon: 'mdi-source-commit',
+    title: 'ver 0.03_dev',
+    content: [
+      {
+        type: 'param',
+        text: '开发版本',
+      },
+      {
+        type: 'list',
+        text: ['新增活动期右键链接复制功能'],
       },
     ],
   },

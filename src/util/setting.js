@@ -2,6 +2,7 @@ import { useStorage } from '@vueuse/core'
 
 const defaultSetting = {
     curVersion: '0.021',
+    //---------------------
     lastVisitedVersion: null,
     lastNewsViewTime: null
 }
@@ -15,4 +16,12 @@ function setSetting(key, value) {
     settings.value[key] = value
 }
 
-export { getSetting, setSetting }
+const refreshSettingRange = [
+    'curVersion'
+]
+
+function refreshSetting() {
+    refreshSettingRange.forEach(k => setSetting(k, defaultSetting[k]))
+}
+
+export { getSetting, setSetting, refreshSetting }

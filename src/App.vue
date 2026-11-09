@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, mergeProps } from 'vue';
-import { useUrlSearchParams } from '@vueuse/core'
+import { useUrlSearchParams, useClipboard, useBrowserLocation } from '@vueuse/core'
 
-import { getSetting } from './util/setting.js'
+import { getSetting, refreshSetting } from './util/setting.js'
 import { getNewsTime } from './util/bulletin.js'
 
 import aboutDialog from './components/aboutDialog.vue';
@@ -18,6 +18,8 @@ import { getIsMobile } from './util/display.js';
 import { useGoTo } from 'vuetify';
 
 const route = useUrlSearchParams('history')
+const { copy: copyText } = useClipboard()
+const navlocation = useBrowserLocation()
 
 const goTo = useGoTo();
 
@@ -73,6 +75,8 @@ const checkMenuUnread = function() {
   })
   return isUnread
 }
+
+const snackbar = ref(false)
 
 //Database
 const seasonNo = ref(1);
@@ -151,6 +155,12 @@ const switchSeasonDatabase = function (i) {
     refreshDatabase();
   }
 };
+const copySeasonRouteName = function(name) {
+  let text = navlocation.value.origin + navlocation.value.pathname + "?season="+name
+  if (route.grid) text += "&grid=true"
+  copyText(text)
+  snackbar.value = true
+}
 const refreshDatabase = async function () {
   rawDatabase.value = await getSPDatabase(seasonNo.value);
 };
@@ -181,6 +191,7 @@ onMounted(async () => {
     opDisplayModeIsGrid.value = true
   }
   refreshDatabase();
+  refreshSetting();
 });
 </script>
 
@@ -188,6 +199,16 @@ onMounted(async () => {
   <v-app id="inspire">
     <!--顶栏-->
     <v-app-bar class="bg-primary">
+      <v-snackbar
+        v-model="snackbar"
+        timeout="2500"
+        color="primary"
+        location="top"
+      >
+        <v-icon icon="mdi-check-circle" />
+        已复制链接
+      </v-snackbar>
+
       <v-app-bar-title>
         <span class="hidden-sm-and-down">
           卫戍协议&nbsp;
@@ -217,10 +238,17 @@ onMounted(async () => {
 
         <v-list>
           <v-list-item
+            density="compact"
+            variant="text"
+          >
+            <v-list-item-subtitle>点击跳转，右键复制活动期链接</v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item
             v-for="(item, index) in seasonDropDown"
             :key="index"
             :value="index"
             @click="switchSeasonDatabase(index)"
+            @contextmenu.prevent="copySeasonRouteName(item.routeName)"
             density="compact"
             :class="[seasonNo == index + 1 ? 'bg-primary' : '']"
             :lines="seasonNo == index + 1 ? 'two' : false"
@@ -230,7 +258,7 @@ onMounted(async () => {
               <v-icon v-else :icon="item.icon" />
             </template>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-            <v-list-item-subtitle class="text-caption" v-if="seasonNo == index + 1">{{ item.subtext }}<br>({{ item.routeName }})</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-caption" v-if="seasonNo == index + 1">{{ item.subtext }}</v-list-item-subtitle>
           </v-list-item>
         </v-list>
       </v-menu>

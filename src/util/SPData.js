@@ -4,8 +4,9 @@ import { PROFESSTION_MAP } from './general.js';
 
 const SP_SEASON = {
   1: {
-    mode: 'ACTIVITY_SEASON',
+    mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act2autochess',
+    archiveFile: 'alliance_2nd_p2.json',
     routeName: 'alliance_2nd_2',
     menuitem: {
       icon: 'mdi-dots-triangle',
