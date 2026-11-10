@@ -10,6 +10,7 @@ import { getImagePath } from '../util/general.js';
 const mobile = getIsMobile();
 
 const getAvatar = function (id) {
+  if (id in avatarRedirect.value) {id = avatarRedirect.value[id]}
   return `${TORAPPU_ENDPOINT}/assets/char_avatar/${id}.png`;
 };
 
@@ -21,6 +22,10 @@ const rankText = ref({
   5: 'Ⅴ',
   6: 'Ⅵ',
 });
+
+const avatarRedirect = ref({
+  char_1037_amiya3: 'char_1037_amiya3_2'
+})
 
 const goToOpPage = (link) => {
   window.open('https://prts.wiki/w/' + link, '_blank');
@@ -95,7 +100,7 @@ const props = defineProps({
           <bondIcon v-for="n in 3 - char.chess[0].bonds.length" />
         </div>
         <div class="d-flex flex-row align-center ga-1">
-          <garItem :gar="char.chess[0].gars[0]" />
+          <garItem :gar="char.chess[0].gars[0]" :plaintext="char.chess[0].garsPlainText"/>
         </div>
       </v-sheet>
     </td>
@@ -115,7 +120,7 @@ const props = defineProps({
           <bondIcon v-for="n in 3 - char.chess[1].bonds.length" />
         </div>
         <div class="d-flex flex-row align-center ga-1">
-          <garItem :gar="char.chess[1].gars[0]" />
+          <garItem :gar="char.chess[1].gars[0]" :plaintext="char.chess[1].garsPlainText"/>
         </div>
       </v-sheet>
     </td>

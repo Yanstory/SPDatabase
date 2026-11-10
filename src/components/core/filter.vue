@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { buildTagKeySets, countFilterItems } from '../../util/filterMatch.js';
 
 /*
 Rule format:
@@ -24,6 +25,11 @@ Rule format:
 
 const props = defineProps({
   filters: Array,
+  // 干员表，用于统计每个标签的“符合人数”
+  opList: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const filterOptions = ref({
@@ -46,6 +52,10 @@ function switchPanel() {
 
 function getCurrentRule(ruleSetIndex) {
   return filterOptions.value.selectRule[ruleSetIndex];
+}
+
+function isSelected(ruleSetIndex, itemKey) {
+  return !!filterOptions.value.selectItems[ruleSetIndex]?.includes(itemKey);
 }
 
 function selectItem(ruleSetIndex, itemKey) {
@@ -112,6 +122,26 @@ function changeRule(ruleSetIndex) {
   }
 }
 
+//-----标签符合人数-----
+// 每个干员每种形态在各过滤器下命中的标签集合；数据库或过滤器规则变化时重算
+const tagKeySets = computed(() => buildTagKeySets(props.filters, props.opList));
+
+// 是否至少有一个过滤器正在生效（选中了标签）
+const filterActive = computed(() =>
+  (filterOptions.value.selectItems || []).some((items) => (items || []).length > 0)
+);
+
+// 生效时统计每个过滤器每个标签的符合人数：[过滤器下标][标签下标]；未生效时为 null
+const matchCounts = computed(() => {
+  if (!filterActive.value) return null;
+
+  const { selectRule, selectItems } = filterOptions.value;
+
+  return (props.filters || []).map((rule, index) =>
+    countFilterItems(tagKeySets.value, selectRule, selectItems, index, rule.items)
+  );
+});
+
 onMounted(() => {
   filterOptions.value.selectItems = [];
   props.filters.forEach((_) => filterOptions.value.selectItems.push([]));
@@ -167,23 +197,35 @@ defineExpose({
           </v-sheet>
           <!--过滤器内容-->
           <div class="d-flex flex-wrap ga-2">
-            <v-chip
-              v-for="item in rule.items"
-              label
-              :variant="
-                filterOptions.selectItems[index]?.includes(item.key)
-                  ? 'elevated'
-                  : 'tonal'
+            <v-badge
+              v-for="(item, itemIndex) in rule.items"
+              :key="item.key"
+              :content="matchCounts?.[index]?.[itemIndex]"
+              :model-value="
+                !isSelected(index, item.key) &&
+                !!matchCounts &&
+                matchCounts[index][itemIndex] > 0
               "
-              :color="
-                filterOptions.selectItems[index]?.includes(item.key)
-                  ? 'primary-light'
+              location="top center"
+              color="primary"
+              text-color="white"
+              :style="
+                !isSelected(index, item.key) &&
+                matchCounts &&
+                matchCounts[index][itemIndex] === 0
+                  ? 'opacity: 0.4'
                   : ''
               "
-              @click="selectItem(index, item.key)"
             >
-              {{ item.name }}
-            </v-chip>
+              <v-chip
+                label
+                :variant="isSelected(index, item.key) ? 'elevated' : 'tonal'"
+                :color="isSelected(index, item.key) ? 'primary-light' : ''"
+                @click="selectItem(index, item.key)"
+              >
+                {{ item.name }}
+              </v-chip>
+            </v-badge>
           </div>
         </v-sheet>
       </v-sheet>

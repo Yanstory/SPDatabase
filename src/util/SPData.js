@@ -4,12 +4,31 @@ import { PROFESSTION_MAP } from './general.js';
 
 const SP_SEASON = {
   1: {
+    mode: 'PERM_SEASON',
+    seasonCode: [
+      'act3autochess',
+      'V3_1'
+    ],
+    routeName: 'regulation_seq1',
+    menuitem: {
+      icon: '$regulation',
+      text: '规程 序列I',
+      subtext: 'Regulation Sequence I'
+    },
+    additionalParseParam: {
+      extraAddOp: [
+        "char_616_pithst",
+        "char_618_acrbot"
+      ]
+    }
+  },
+  2: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act2autochess',
     archiveFile: 'alliance_2nd_p2.json',
     routeName: 'alliance_2nd_2',
     menuitem: {
-      icon: 'mdi-dots-triangle',
+      icon: '$alliance',
       text: '盟约 下半 更新#2',
       subtext: 'Alliance 2nd Phase Update #2'
     },
@@ -19,13 +38,13 @@ const SP_SEASON = {
       ]
     }
   },
-  2: {
+  3: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act2autochess',
     archiveFile: 'alliance_2nd.json',
     routeName: 'alliance_2nd',
     menuitem: {
-      icon: 'mdi-dots-triangle',
+      icon: '$alliance',
       text: '盟约 下半',
       subtext: 'Alliance 2nd Phase'
     },
@@ -35,13 +54,13 @@ const SP_SEASON = {
       ]
     }
   },
-  3: {
+  4: {
     mode: 'ACTIVITY_SEASON_ARC',
     seasonCode: 'act1autochess',
     archiveFile: 'alliance_1st.json',
     routeName: 'alliance',
     menuitem: {
-      icon: 'mdi-dots-triangle',
+      icon: '$alliance',
       text: '盟约',
       subtext: 'Alliance'
     },
@@ -78,17 +97,154 @@ const spCharRedirect = {
   char_613_acmedc: 'Touch(卫戍协议)',
   //char_617_sharp2: '领主·Sharp',
   //char_616_pithst: '盟约·辅助干员',
+  //------------------
+  char_1037_amiya3: '阿米娅(医疗)'
 };
 const bondBan = [
   '绝技'
 ]
 
 const OP_DATA = await fetchJSON('excel/character_table.json');
+const OP_PATCH_DATA = await fetchJSON('excel/char_patch_table.json');
 const ACT_DATA = await fetchJSON('excel/activity_table.json');
 
 const getSPDatabase = async function (seasonNo) {
   const season = SP_SEASON[seasonNo.toString()];
-  if (season.mode == 'ACTIVITY_SEASON' || season.mode == 'ACTIVITY_SEASON_ARC') {
+  if (season.mode == 'PERM_SEASON' || season.mode == 'PERM_SEASON_ARC') {
+    let actData = season.mode == 'PERM_SEASON' ? ACT_DATA : (await fetchJSON_arc(season.archiveFile));
+    let bondMetaList = actData[ACT_EXTRA_DATAKEY].bondInfoDict;
+    let garrisonList = 
+      actData.activity['AUTOCHESS'][season.seasonCode[0]][season.seasonCode[1]].garrisonDataDict;
+    let result = {
+      seasonNo,
+      dataMode: season.mode,
+      season: actData.activity['AUTOCHESS'][season.seasonCode[0]][season.seasonCode[1]],
+      extra: actData[ACT_EXTRA_DATAKEY],
+      filterRuleSet: [
+        genFilterRule(
+          '等阶',
+          [
+            { key: '1', name: 'Ⅰ' },
+            { key: '2', name: 'Ⅱ' },
+            { key: '3', name: 'Ⅲ' },
+            { key: '4', name: 'Ⅳ' },
+            { key: '5', name: 'Ⅴ' },
+            { key: '6', name: 'Ⅵ' },
+          ],
+          function (chess) {
+            return [chess.rank.toString()];
+          }
+        ),
+        genFilterRule(
+          '核心盟约',
+          Object.values(bondMetaList).reduce((acc, bond) => {
+            if (bond.bondType == 'SEASON') {
+              return [...acc, { key: bond.bondId, name: bond.name }];
+            }
+            return acc;
+          }, []),
+          function (chess) {
+            return chess.bonds.map((b) => b.id);
+          }
+        ),
+        genFilterRule(
+          '附加盟约',
+          Object.values(bondMetaList).reduce((acc, bond) => {
+            if (bond.bondType == 'REGULAR' && !bondBan.includes(bond.name)) {
+              return [...acc, { key: bond.bondId, name: bond.name }];
+            }
+            return acc;
+          }, []),
+          function (chess) {
+            return chess.bonds.map((b) => b.id);
+          }
+        ),
+        genFilterRule(
+          '特质词条',
+          uniquied(
+            Object.values(garrisonList).map((gar) => {
+              return { key: gar.eventTypeDesc, name: gar.eventTypeDesc };
+            })
+          ),
+          function (chess) {
+            return chess.gars.map((g) => g.eventTypeDesc);
+          }
+        ),
+      ],
+      opList: {},
+    };
+    Object.values(result.season.charChessDataDict).forEach((chess) => {
+      if (!chess.chessId.includes('diy') && chess.upgradeChessId) {
+        //console.log(chess.chessId);
+        let isGolden = 0; //精锐
+
+        let chessChar = result.season.charShopChessDatas[chess.chessId];
+        let charId = chessChar.tmplId || chessChar.charId; //干员（*适配阿米娅升变）
+        let char_patched = !!chessChar.tmplId
+
+        //--------isHidden--------
+        if (chessChar.isHidden && !season.additionalParseParam.extraAddOp.includes(charId)) {
+          return
+        }
+
+        //---------------------------------------------
+        if (!(charId in result.opList)) {
+          let charRaw = OP_DATA[charId];
+          if (char_patched) {
+            charRaw = OP_PATCH_DATA.patchChars[charId]
+          }
+          result.opList[charId] = {
+            id: charId,
+            rarity: charRaw.rarity.replace('TIER_', ''),
+            name: charRaw.name,
+            profession: PROFESSTION_MAP[charRaw.profession],
+            link: charId in spCharRedirect ? spCharRedirect[charId] : null,
+            chess: [],
+          };
+        }
+        result.opList[charId].chess[isGolden] = {
+          charId,
+          rank: chessChar.chessLevel, //等阶
+          bonds: chess.bondIds.map((b) => {
+            return { id: b, name: result.extra.bondInfoDict[b].name };
+          }), //盟约
+          gars: chess.garrisonIds.map((g) => {
+            return result.season.garrisonDataDict[g];
+          }), //特质
+          garsPlainText: chess.desc, //特质的普通描述
+        };
+
+        //------golden------
+        chess = result.season.charChessDataDict[chess.upgradeChessId];
+        isGolden = 1; //精锐
+
+        result.opList[charId].chess[isGolden] = {
+          charId,
+          rank: chessChar.chessLevel, //等阶
+          bonds: chess.bondIds.map((b) => {
+            return { id: b, name: result.extra.bondInfoDict[b].name };
+          }), //盟约
+          gars: chess.garrisonIds.map((g) => {
+            return result.season.garrisonDataDict[g];
+          }), //特质
+          garsPlainText: chess.desc, //特质的普通描述
+        };
+      }
+    });
+    //-----opList重排------
+    // 以 chess[0].rank（基础形态的等阶）为基准升序重排：等阶低的干员排在前面。
+    // opList 的键是非整数（charId），所以重建对象即可决定 Object.keys / v-for 的遍历顺序。
+    const opBaseRank = (op) => {
+      const base = op?.chess?.[0];
+      // 理论上每个干员都有 chess[0]；万一缺失，排到最后而不是当作等阶 0
+      return base?.rank == null ? Number.MAX_SAFE_INTEGER : Number(base.rank);
+    };
+    result.opList = Object.fromEntries(
+      Object.entries(result.opList).sort(([, a], [, b]) => opBaseRank(a) - opBaseRank(b))
+    );
+    return result;
+  }
+  else if (season.mode == 'ACTIVITY_SEASON' || season.mode == 'ACTIVITY_SEASON_ARC') {
     let actData = season.mode == 'ACTIVITY_SEASON' ? ACT_DATA : (await fetchJSON_arc(season.archiveFile));
     let bondMetaList = actData[ACT_EXTRA_DATAKEY].bondInfoDict;
     let garrisonList =

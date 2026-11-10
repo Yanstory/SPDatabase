@@ -72,7 +72,7 @@ defineExpose({
       <v-card-text class="d-flex flex-column ga-2" style="height: 100%">
         <div>
           <p>卫戍协议 盟约·特质查询</p>
-          <p class="text-body-2 text-medium-emphasis">v0.01_dev</p>
+          <p class="text-body-2 text-medium-emphasis">v0.03_dev</p>
         </div>
         <devCard :dev="DEV_LIST.enko" />
         <devCard :dev="DEV_LIST.mcak" />

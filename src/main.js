@@ -9,6 +9,10 @@ import * as directives from 'vuetify/directives';
 import '@mdi/font/css/materialdesignicons.css'; // Ensure you are using css-loader
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
 
+// custom icons
+import AllianceIcon from './components/icons/Alliance.vue';
+import RegulationIcon from './components/icons/Regulation.vue';
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -38,7 +42,10 @@ const vuetify = createVuetify({
   },
   icons: {
     defaultSet: 'mdi',
-    aliases,
+    aliases:{
+      alliance: AllianceIcon,
+      regulation: RegulationIcon
+    },
     sets: {
       mdi,
     },

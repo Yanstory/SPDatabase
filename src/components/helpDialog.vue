@@ -75,6 +75,16 @@ const items = [
     actions: null,
   },
   {
+    title: '干员太多了，我怎么找某一个干员？',
+    content: [
+    {
+      type: 'param',
+      text: '使用 Ctrl + F 拉起查找功能查找。',
+    },
+    ],
+    actions: null,
+  },
+  {
     title: '为什么不将这个系统嵌入到PRTS本身，就像其它的一样？',
     content: [
     {

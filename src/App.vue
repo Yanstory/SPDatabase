@@ -324,6 +324,7 @@ onMounted(async () => {
         <filterSelector
           v-if="rawDatabase.filterRuleSet"
           :filters="rawDatabase.filterRuleSet"
+          :opList="rawDatabase.opList"
           ref="flS"
         />
         <v-divider />

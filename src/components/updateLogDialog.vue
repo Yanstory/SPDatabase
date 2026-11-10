@@ -16,9 +16,11 @@ function switchDialog() {
 
 const items = [
   {
+    current: true,
     color: 'primary',
-    icon: 'mdi-play',
-    title: 'ver 0.01_dev',
+    icon: 'mdi-source-commit',
+    title: 'ver 0.03_dev',
+    time: '2026-11-10',
     content: [
       {
         type: 'param',
@@ -26,7 +28,7 @@ const items = [
       },
       {
         type: 'list',
-        text: ['基础UI、功能、框架建设', '适配数据库读取', '适配活动期：盟约'],
+        text: ['适配活动期：规程 序列I', '新增过滤器计数功能(Beta)：选择过滤器后会立刻计算其它盟约的对应人数','新增活动期右键链接复制功能', '活动期图标优化', '其它细节修补'],
       },
     ],
   },
@@ -35,6 +37,7 @@ const items = [
     color: 'primary',
     icon: 'mdi-source-commit',
     title: 'ver 0.02_dev',
+    time: '2026-03-27',
     content: [
       {
         type: 'param',
@@ -49,10 +52,10 @@ const items = [
     ],
   },
   {
-    current: true,
     color: 'primary',
-    icon: 'mdi-source-commit',
-    title: 'ver 0.03_dev',
+    icon: 'mdi-play',
+    title: 'ver 0.01_dev',
+    time: "2025-12-07",
     content: [
       {
         type: 'param',
@@ -60,16 +63,18 @@ const items = [
       },
       {
         type: 'list',
-        text: ['新增活动期右键链接复制功能'],
+        text: ['基础UI、功能、框架建设', '适配数据库读取', '适配活动期：盟约'],
       },
     ],
   },
+  /*
   {
     color: 'primary',
     icon: 'mdi-autorenew mdi-spin',
     title: '持续更新中……',
     content: null,
   },
+  */
 ];
 
 defineExpose({
@@ -84,7 +89,7 @@ defineExpose({
         <v-icon icon="mdi-timeline-clock mr-2" size="small"/> 更新履历
       </v-card-title>
       <v-card-text class="d-flex flex-column ga-2" style="height: 100%;">
-        <v-timeline align="start" truncate-line="start" class="justify-left" side="end">
+        <v-timeline align="start" truncate-line="end" class="justify-left" side="end">
           <v-timeline-item
             v-for="(item, index) in items"
             :key="index"
@@ -103,6 +108,11 @@ defineExpose({
                   当前
                 </v-chip>
                 {{ item.title }}
+                <div class="float-right">
+                  <v-chip prepend-icon="mdi-clock-time-four-outline" size="small">
+                    {{ item.time }}
+                  </v-chip>
+                </div>
               </v-card-title>
               <v-card-text class="pa-5" v-if="!!item.content">
                 <p v-for="log in item.content">

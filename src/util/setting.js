@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core'
 
 const defaultSetting = {
-    curVersion: '0.021',
+    curVersion: '0.030',
     //---------------------
     lastVisitedVersion: null,
     lastNewsViewTime: null

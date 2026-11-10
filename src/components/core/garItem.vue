@@ -7,6 +7,10 @@ const props = defineProps({
     type: Object,
     default: {},
   },
+  plaintext: {
+    type: String || null,
+    default: null,
+  },
 });
 </script>
 
@@ -28,6 +32,6 @@ const props = defineProps({
       />
       &nbsp;{{ gar.eventTypeDesc }}
     </v-chip>
-    <span v-html="applyRichText(gar.description).replace('\\n', '<br>')"></span>
+    <span v-html="applyRichText(plaintext || gar.description).replace('\\n', '<br>')"></span>
   </v-sheet>
 </template>
