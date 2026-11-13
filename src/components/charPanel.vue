@@ -49,7 +49,7 @@ const props = defineProps({
             :image="getAvatar(char.id)"
             rounded="0"
             :size="mobile ? 45 : 70"
-            :color="`rare-${char.rarity}`"
+            :color="`rank-${char.chess[0].rank}`"
             @click="goToOpPage(char.link || char.name)"
             class="op-icon cursor-pointer"
           ></v-avatar>
@@ -131,7 +131,7 @@ const props = defineProps({
             :image="getAvatar(char.id)"
             rounded="0"
             :size="mobile ? 45 : 70"
-            :color="`rare-${char.rarity}`"
+            :color="`rank-${char.chess[0].rank}`"
             @click="goToOpPage(char.link || char.name)"
             class="op-icon cursor-pointer"
           ></v-avatar>
