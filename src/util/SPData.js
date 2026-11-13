@@ -1,6 +1,7 @@
 import { fetchJSON, fetchJSON_arc } from './const.js';
 
 import { PROFESSTION_MAP } from './general.js';
+import { coreBondFilter } from './filterMatch.js';
 
 const SP_SEASON = {
   1: {
@@ -113,6 +114,7 @@ const getSPDatabase = async function (seasonNo) {
   if (season.mode == 'PERM_SEASON' || season.mode == 'PERM_SEASON_ARC') {
     let actData = season.mode == 'PERM_SEASON' ? ACT_DATA : (await fetchJSON_arc(season.archiveFile));
     let bondMetaList = actData[ACT_EXTRA_DATAKEY].bondInfoDict;
+    const coreFilter = coreBondFilter(bondMetaList);
     let garrisonList = 
       actData.activity['AUTOCHESS'][season.seasonCode[0]][season.seasonCode[1]].garrisonDataDict;
     let result = {
@@ -137,15 +139,8 @@ const getSPDatabase = async function (seasonNo) {
         ),
         genFilterRule(
           '核心盟约',
-          Object.values(bondMetaList).reduce((acc, bond) => {
-            if (bond.bondType == 'SEASON') {
-              return [...acc, { key: bond.bondId, name: bond.name }];
-            }
-            return acc;
-          }, []),
-          function (chess) {
-            return chess.bonds.map((b) => b.id);
-          }
+          coreFilter.items,
+          coreFilter.valueToVerify
         ),
         genFilterRule(
           '附加盟约',
@@ -247,6 +242,7 @@ const getSPDatabase = async function (seasonNo) {
   else if (season.mode == 'ACTIVITY_SEASON' || season.mode == 'ACTIVITY_SEASON_ARC') {
     let actData = season.mode == 'ACTIVITY_SEASON' ? ACT_DATA : (await fetchJSON_arc(season.archiveFile));
     let bondMetaList = actData[ACT_EXTRA_DATAKEY].bondInfoDict;
+    const coreFilter = coreBondFilter(bondMetaList);
     let garrisonList =
       actData.activity['AUTOCHESS_SEASON'][season.seasonCode].garrisonDataDict;
     let result = {
@@ -271,15 +267,8 @@ const getSPDatabase = async function (seasonNo) {
         ),
         genFilterRule(
           '核心盟约',
-          Object.values(bondMetaList).reduce((acc, bond) => {
-            if (bond.bondType == 'SEASON') {
-              return [...acc, { key: bond.bondId, name: bond.name }];
-            }
-            return acc;
-          }, []),
-          function (chess) {
-            return chess.bonds.map((b) => b.id);
-          }
+          coreFilter.items,
+          coreFilter.valueToVerify
         ),
         genFilterRule(
           '附加盟约',

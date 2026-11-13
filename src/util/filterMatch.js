@@ -9,6 +9,21 @@
 
 const EMPTY = Object.freeze([]);
 
+export const NO_CORE_BOND = '__no_core_bond__';
+
+/** 生成核心盟约标签及匹配函数，供所有活动期与人数统计共用。 */
+export function coreBondFilter(bondMetaList) {
+  const coreBonds = Object.values(bondMetaList).filter(bond => bond.bondType === 'SEASON');
+  const coreIds = new Set(coreBonds.map(bond => bond.bondId));
+  return {
+    items: [...coreBonds.map(bond => ({ key: bond.bondId, name: bond.name })), { key: NO_CORE_BOND, name: '无核心盟约' }],
+    valueToVerify(chess) {
+      const ids = chess.bonds.map(bond => bond.id);
+      return ids.some(id => coreIds.has(id)) ? ids : [...ids, NO_CORE_BOND];
+    },
+  };
+}
+
 function keysOf(selectItems, index) {
   return selectItems?.[index] ?? EMPTY;
 }
